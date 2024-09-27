@@ -847,15 +847,10 @@ class DebugOutput {
   // Helper alias to avoid obscure type `const char* const*` in signature.
   using expr_t = const char*;
 
-  DebugOutput(const char* filepath, int line, const char* function_name)
+  DebugOutput(int line, const char* function_name)
       : m_use_colorized_output(isColorizedOutputEnabled()) {
-    std::string path = filepath;
-    const std::size_t path_length = path.length();
-    if (path_length > MAX_PATH_LENGTH) {
-      path = ".." + path.substr(path_length - MAX_PATH_LENGTH, MAX_PATH_LENGTH);
-    }
     std::stringstream ss;
-    ss << ansi(ANSI_DEBUG) << "[" << path << ":" << line << " ("
+    ss << ansi(ANSI_DEBUG) << "[" << line << " ("
        << function_name << ")] " << ansi(ANSI_RESET);
     m_location = ss.str();
   }
@@ -997,7 +992,7 @@ auto identity(T&&, U&&... u) -> last_t<U...> {
 #define DBG_TYPE_NAME(x) dbg::type_name<decltype(x)>()
 
 #define dbg(...)                                    \
-  dbg::DebugOutput(__FILE__, __LINE__, __func__)    \
+  dbg::DebugOutput(__LINE__, __func__)    \
       .print({DBG_MAP(DBG_STRINGIFY, __VA_ARGS__)}, \
              {DBG_MAP(DBG_TYPE_NAME, __VA_ARGS__)}, __VA_ARGS__)
 #else
